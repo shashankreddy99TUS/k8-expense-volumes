@@ -1,4 +1,5 @@
 # Headless service, normal service, StatefulSet
+# Headless Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -15,10 +16,11 @@ spec:
     project: expense
     tier: db
   ports:
-  - protocol: TCP
-    port: 3306 # service port
-    targetPort: 3306
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
 ---
+# Regular Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -34,46 +36,44 @@ spec:
     project: expense
     tier: db
   ports:
-  - protocol: TCP
-    port: 3306 # service port
-    targetPort: 3306
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
 ---
+# StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mysql
   namespace: expense
 spec:
+  serviceName: "mysql-headless"
+  replicas: 2
   selector:
     matchLabels:
       app: mysql
       project: expense
-      tier: db # has to match .spec.template.metadata.labels
-  serviceName: "mysql-headless"
-  replicas: 2 # by default is 1
-  minReadySeconds: 10 # by default is 0
+      tier: db
   template:
     metadata:
       labels:
         app: mysql
         project: expense
-        tier: db # has to match .spec.selector.matchLabels
+        tier: db
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-      - name: mysql
-        image: joindevops/mysql:1.0.0
-        volumeMounts:
         - name: mysql
-          mountPath: /var/lib/mysql
-  # Instead of creating a PVC resource, you can directly provide in statefulset
+          image: joindevops/mysql:1.0.0
+          volumeMounts:
+            - name: mysql
+              mountPath: /var/lib/mysql
   volumeClaimTemplates:
-  - metadata:
-      name: mysql
-      namespace: expense
-    spec: 
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "ebs-sc"
-      resources:
-        requests:
-          storage: 1Gi
+    - metadata:
+        name: mysql
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: ebs-sc
+        resources:
+          requests:
+            storage: 1Gi
