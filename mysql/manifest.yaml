@@ -1,5 +1,4 @@
-# Headless service, normal service, StatefullSet
-
+# Headless service, normal service, StatefulSet
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,20 +9,16 @@ metadata:
     project: expense
     tier: db
 spec:
-  ports:
-  - port: 80
-    name: web
   clusterIP: None
   selector:
-     app: mysql
-     project: expense
-     tier: db
-     ports:
-      - protocal: TCP
-        port: 3306 # service port
-        targetPort: 3306  
+    app: mysql
+    project: expense
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 3306 # service port
+    targetPort: 3306
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -34,19 +29,15 @@ metadata:
     project: expense
     tier: db
 spec:
-  ports:
-  - port: 80
-    name: web
   selector:
-     app: mysql
-     project: expense
-     tier: db
-     ports:
-      - protocal: TCP
-        port: 3306 # service port
-        targetPort: 3306  
+    app: mysql
+    project: expense
+    tier: db
+  ports:
+  - protocol: TCP
+    port: 3306 # service port
+    targetPort: 3306
 ---
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -55,9 +46,9 @@ metadata:
 spec:
   selector:
     matchLabels:
-       app: mysql
-       project: expense # has to match .spec.template.metadata.labels
-       tier: db
+      app: mysql
+      project: expense
+      tier: db # has to match .spec.template.metadata.labels
   serviceName: "mysql-headless"
   replicas: 2 # by default is 1
   minReadySeconds: 10 # by default is 0
@@ -65,13 +56,13 @@ spec:
     metadata:
       labels:
         app: mysql
-        project: expense # has to match .spec.template.metadata.labels
+        project: expense
         tier: db # has to match .spec.selector.matchLabels
     spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: mysql
-        image: shashanka00315964/mysql:1.0.0 
+        image: joindevops/mysql:1.0.0
         volumeMounts:
         - name: mysql
           mountPath: /var/lib/mysql
@@ -80,7 +71,7 @@ spec:
   - metadata:
       name: mysql
       namespace: expense
-    spec:
+    spec: 
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "ebs-sc"
       resources:
