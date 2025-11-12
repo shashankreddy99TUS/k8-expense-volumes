@@ -77,3 +77,12 @@ spec:
         resources:
           requests:
             storage: 1Gi
+
+
+
+#             sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+# sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+# sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+
+# curl -sS https://webinstall.dev/k9s | bash
+# k9s
