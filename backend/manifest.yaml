@@ -1,13 +1,14 @@
-
-kind: ConfigMap
+# ConfigMap for backend
 apiVersion: v1
+kind: ConfigMap
 metadata:
   name: backend
   namespace: expense
-data:  
-  DB_HOST: mysql  
+data:
+  DB_HOST: mysql
 
 ---
+# Deployment for backend
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -34,13 +35,14 @@ spec:
       containers:
         - name: backend
           image: shashanka00315964/backend:1.0.0
-           
+          ports:
+            - containerPort: 8080
           envFrom:
-              - configMapRef:
+            - configMapRef:
                 name: backend
 
 ---
-
+# Service for backend
 apiVersion: v1
 kind: Service
 metadata:
